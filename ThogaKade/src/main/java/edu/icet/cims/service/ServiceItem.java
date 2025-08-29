@@ -3,8 +3,8 @@ package edu.icet.cims.service;
 import edu.icet.cims.model.dto.ItemDTO;
 import edu.icet.cims.model.entity.ItemEntity;
 import edu.icet.cims.repository.RepositoryItem;
-import edu.icet.cims.utill.validator.CommonValidatorUtil;
-import edu.icet.cims.utill.validator.ItemValidatorUtil;
+import edu.icet.cims.util.validator.CommonValidatorUtil;
+import edu.icet.cims.util.validator.ItemValidatorUtil;
 
 import java.sql.SQLException;
 import java.util.ArrayList;

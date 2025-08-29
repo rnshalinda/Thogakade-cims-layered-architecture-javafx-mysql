@@ -2,10 +2,10 @@ package edu.icet.cims.controller;
 
 import edu.icet.cims.model.dto.ItemDTO;
 import edu.icet.cims.service.ServiceItem;
-import edu.icet.cims.utill.AlertPopupUtil;
-import edu.icet.cims.utill.SessionUserUtil;
-import edu.icet.cims.utill.WindowManagerUtil;
-import edu.icet.cims.utill.validator.CommonValidatorUtil;
+import edu.icet.cims.util.AlertPopupUtil;
+import edu.icet.cims.util.SessionUserUtil;
+import edu.icet.cims.util.WindowManagerUtil;
+import edu.icet.cims.util.validator.CommonValidatorUtil;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;

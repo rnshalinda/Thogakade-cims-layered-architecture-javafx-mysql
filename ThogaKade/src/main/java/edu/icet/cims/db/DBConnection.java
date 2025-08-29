@@ -9,6 +9,7 @@ public class DBConnection {
 
     private static DBConnection db;
     private Connection connection;
+//    private dbDTO dbAccessCredentials;
 
     private DBConnection() throws SQLException {
         connection = DriverManager.getConnection("jdbc:mysql://localhost/thogakade_cims","root","1234");

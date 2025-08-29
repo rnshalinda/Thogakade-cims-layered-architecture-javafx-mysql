@@ -1,7 +1,7 @@
 package edu.icet.cims.controller;
 
-import edu.icet.cims.utill.SessionUserUtil;
-import edu.icet.cims.utill.WindowManagerUtil;
+import edu.icet.cims.util.SessionUserUtil;
+import edu.icet.cims.util.WindowManagerUtil;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;

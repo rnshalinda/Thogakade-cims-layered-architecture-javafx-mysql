@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToggleGroup?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane prefHeight="488.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="edu.icet.cims.controller.configDb.ConfigDbAccessController">
+   <children>
+      <RadioButton fx:id="btn_radioLocalDb" layoutX="91.0" layoutY="112.0" mnemonicParsing="false" onAction="#btn_radaioToggleAction" text="Local database">
+         <font>
+            <Font name="Arial Bold" size="15.0" />
+         </font>
+         <toggleGroup>
+            <ToggleGroup fx:id="btn_radioToggleGroup" />
+         </toggleGroup>
+      </RadioButton>
+      <RadioButton fx:id="btn_radioRemoteDb" layoutX="91.0" layoutY="273.0" mnemonicParsing="false" onAction="#btn_radaioToggleAction" text="Remote database" toggleGroup="$btn_radioToggleGroup">
+         <font>
+            <Font name="Arial Bold" size="15.0" />
+         </font>
+      </RadioButton>
+      <Label layoutX="120.0" layoutY="39.0" text="Configure database access details">
+         <font>
+            <Font name="Arial Bold" size="22.0" />
+         </font>
+      </Label>
+      <Label layoutX="174.0" layoutY="351.0" text="url : ">
+         <font>
+            <Font name="Arial Bold" size="13.0" />
+         </font>
+      </Label>
+      <Label layoutX="164.0" layoutY="198.0" text="user : ">
+         <font>
+            <Font name="Arial Bold" size="13.0" />
+         </font>
+      </Label>
+      <Label layoutX="333.0" layoutY="198.0" text="pswd : ">
+         <font>
+            <Font name="Arial Bold" size="13.0" />
+         </font>
+      </Label>
+      <CheckBox fx:id="chkBox_portLocal" layoutX="457.0" layoutY="160.0" mnemonicParsing="false" onAction="#chkBoxAction" text="3306 default" textFill="#2346b0ed">
+         <font>
+            <Font name="System Bold" size="12.0" />
+         </font></CheckBox>
+      <Label layoutX="233.0" layoutY="114.0" text="( url -&gt; jdbc:mysql://localhost:3306/thogakade_cims )" textFill="#b23f3f" />
+      <Label layoutX="341.0" layoutY="160.0" text="port : ">
+         <font>
+            <Font name="Arial Bold" size="13.0" />
+         </font>
+      </Label>
+      <TextField fx:id="txt_portLocal" layoutX="385.0" layoutY="157.0" prefHeight="16.0" prefWidth="52.0" promptText="3306" />
+      <TextField fx:id="txt_userLocal" layoutX="210.0" layoutY="195.0" prefHeight="25.0" prefWidth="77.0" promptText="root" />
+      <CheckBox fx:id="chkBox_userLocal" layoutX="211.0" layoutY="228.0" mnemonicParsing="false" onAction="#chkBoxAction" text="'root' default" textFill="#2346b0ed">
+         <font>
+            <Font name="System Bold" size="12.0" />
+         </font></CheckBox>
+      <TextField fx:id="txt_pswdLocal" layoutX="384.0" layoutY="195.0" prefHeight="25.0" prefWidth="77.0" promptText="1234" />
+      <Label layoutX="164.0" layoutY="388.0" text="user : ">
+         <font>
+            <Font name="Arial Bold" size="13.0" />
+         </font>
+      </Label>
+      <Label layoutX="333.0" layoutY="387.0" text="pswd : ">
+         <font>
+            <Font name="Arial Bold" size="13.0" />
+         </font>
+      </Label>
+      <TextField fx:id="txt_userRemote" layoutX="209.0" layoutY="384.0" prefHeight="25.0" prefWidth="77.0" />
+      <TextField fx:id="txt_pswdRemote" layoutX="384.0" layoutY="384.0" prefHeight="25.0" prefWidth="77.0" />
+      <TextField fx:id="txt_urlRemote" layoutX="208.0" layoutY="347.0" prefHeight="25.0" prefWidth="282.0" promptText="jdbc:mysql://192.168.1.10 : 8080 / thogakade_cims" />
+      <Button fx:id="btn_goBack" layoutX="405.0" layoutY="440.0" mnemonicParsing="false" onAction="#btn_goBackAction" text="Back">
+         <font>
+            <Font name="Arial Bold" size="12.0" />
+         </font>
+      </Button>
+      <Button fx:id="btn_configure" defaultButton="true" layoutX="466.0" layoutY="440.0" mnemonicParsing="false" onAction="#btn_configureAction" text="Confighure">
+         <font>
+            <Font name="Arial Bold" size="12.0" />
+         </font>
+      </Button>
+      <Label layoutX="138.0" layoutY="162.0" text="db name : ">
+         <font>
+            <Font name="Arial Bold" size="13.0" />
+         </font>
+      </Label>
+      <TextField fx:id="txt_dbNameLocal" layoutX="210.0" layoutY="157.0" prefHeight="25.0" prefWidth="104.0" promptText="thogakade_cims" />
+      <Label layoutX="137.0" layoutY="316.0" text="db name : ">
+         <font>
+            <Font name="Arial Bold" size="13.0" />
+         </font>
+      </Label>
+      <TextField fx:id="txt_dbNameRemote" layoutX="209.0" layoutY="311.0" prefHeight="25.0" prefWidth="104.0" promptText="thogakade_cims" />
+   </children>
+</AnchorPane>

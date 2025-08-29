@@ -3,9 +3,9 @@ package edu.icet.cims.controller;
 import edu.icet.cims.model.dto.*;
 import edu.icet.cims.service.*;
 
-import edu.icet.cims.utill.AlertPopupUtil;
-import edu.icet.cims.utill.SessionUserUtil;
-import edu.icet.cims.utill.WindowManagerUtil;
+import edu.icet.cims.util.AlertPopupUtil;
+import edu.icet.cims.util.SessionUserUtil;
+import edu.icet.cims.util.WindowManagerUtil;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -25,6 +25,9 @@ public class LoginController{
 
     @FXML
     private Button btn_login;
+
+    @FXML
+    private Button btn_configDbAccess;
 
     @FXML
     private TextField txt_pswd;
@@ -57,6 +60,11 @@ public class LoginController{
         else{
             AlertPopupUtil.alertMsg(Alert.AlertType.ERROR, "Username & Password cannot be empty");
         }
+    }
+
+    @FXML
+    void btn_ConfigDbAccessAction(ActionEvent event) throws IOException {
+        WindowManagerUtil.switchScene(event, "/view/configDB/ConfigDbAccess.fxml");
     }
 
 }
