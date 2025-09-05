@@ -1,6 +1,5 @@
 package edu.icet.cims;
 
-import edu.icet.cims.util.configDb.DbCheckUtil;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -10,18 +9,7 @@ public class Starter extends Application {
 
     @Override
     public void start(Stage stage) throws Exception {
-        // checks if Database available
-        // if available launch login window
-        // otherwise attempt to create database
-
-
-
-        if(DbCheckUtil.isDbAvailable()){
-            stage.setScene(new Scene(FXMLLoader.load(getClass().getResource("/view/CIMS-Login.fxml"))));
-        }
-        else {
-            stage.setScene(new Scene(FXMLLoader.load(getClass().getResource("/view/TrueFalse.fxml"))));
-        }
+        stage.setScene(new Scene(FXMLLoader.load(getClass().getResource("/view/CIMS-Login.fxml"))));
         stage.show();
     }
 

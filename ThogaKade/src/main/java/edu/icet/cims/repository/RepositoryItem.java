@@ -1,7 +1,6 @@
 package edu.icet.cims.repository;
 
-import edu.icet.cims.db.DBConnection;
-import edu.icet.cims.model.dto.ItemDTO;
+import edu.icet.cims.db.DbConnection;
 import edu.icet.cims.model.entity.ItemEntity;
 
 import java.sql.*;
@@ -16,7 +15,7 @@ public class RepositoryItem {
 
         String sql = "SELECT * FROM item";
 
-        Statement stm = DBConnection.getInstance().getConnection().createStatement();
+        Statement stm = DbConnection.getInstance().getConnection().createStatement();
         ResultSet rst = stm.executeQuery(sql);
 
         while (rst.next()){
@@ -40,7 +39,7 @@ public class RepositoryItem {
 
         String sql = "DELETE FROM item WHERE Item_Code=?";
 
-        PreparedStatement stm = DBConnection.getInstance().getConnection().prepareStatement(sql);
+        PreparedStatement stm = DbConnection.getInstance().getConnection().prepareStatement(sql);
         stm.setObject(1,itemCode);
 //        System.out.println(stm.executeUpdate() > 0);
         return stm.executeUpdate() > 0;
@@ -53,7 +52,7 @@ public class RepositoryItem {
 
         String sql = "INSERT INTO item (Item_Code, Item_Description, Pack_Size, Unit_Price, Qty) VALUES (?,?,?,?,?)";
 
-        PreparedStatement stm = DBConnection.getInstance().getConnection().prepareStatement(sql);
+        PreparedStatement stm = DbConnection.getInstance().getConnection().prepareStatement(sql);
         stm.setObject(1, entity.getItemCode());
         stm.setObject(2, entity.getDescription());
         stm.setObject(3, entity.getPackSize());
@@ -75,7 +74,7 @@ public class RepositoryItem {
                 "Qty=? " +
                 "WHERE Item_Code=?";
 
-        PreparedStatement stm = DBConnection.getInstance().getConnection().prepareStatement(sql);
+        PreparedStatement stm = DbConnection.getInstance().getConnection().prepareStatement(sql);
         stm.setObject(1, entity.getDescription());
         stm.setObject(2, entity.getPackSize());
         stm.setObject(3, entity.getUnitPrice());
@@ -95,7 +94,7 @@ public class RepositoryItem {
                 "WHERE BINARY Item_Code=? " +
                 ");";
 
-        PreparedStatement stm = DBConnection.getInstance().getConnection().prepareStatement(sql);
+        PreparedStatement stm = DbConnection.getInstance().getConnection().prepareStatement(sql);
         stm.setObject(1, itemCode);
         ResultSet rst =  stm.executeQuery();
 

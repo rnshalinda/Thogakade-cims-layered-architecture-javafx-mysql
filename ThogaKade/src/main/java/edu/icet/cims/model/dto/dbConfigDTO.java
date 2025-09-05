@@ -8,10 +8,12 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 
-public class dbConfigDTO {
+public class DbConfigDTO {
 
+    private String host;
     private String dbName;
-    private String url;
     private String user;
     private String pswd;
+    private String port;
+    private String extraParam;
 }

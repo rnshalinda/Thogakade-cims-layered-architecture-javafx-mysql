@@ -5,24 +5,53 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 // Singleton design pattern DB connection
-public class DBConnection {
+public class DbConnection {
 
-    private static DBConnection db;
+    private static DbConnection db;
     private Connection connection;
-//    private dbDTO dbAccessCredentials;
 
-    private DBConnection() throws SQLException {
-        connection = DriverManager.getConnection("jdbc:mysql://localhost/thogakade_cims","root","1234");
+    // class instance - constructor
+    private DbConnection() throws SQLException {
+
+        connection = DriverManager.getConnection(
+                // url - general connection,
+                // connection doesn't contain end-point (dbname), why? to make the connection dynamic and accept queries that are not specific for a db.
+                "jdbc:mysql://"+dbConfig.getDbConfigData().getHost()+":"+dbConfig.getDbConfigData().getPort()+"/",
+                // user
+                dbConfig.getDbConfigData().getUser(),
+                // pswd
+                dbConfig.getDbConfigData().getPswd()
+        );
     }
 
-    public static DBConnection getInstance() throws SQLException {
+    // singleton check
+    public static DbConnection getInstance() throws SQLException {
         if(db == null){
-            db = new DBConnection();
+            db = new DbConnection();
         }
         return db;
     }
 
+
+    // get db connection
     public Connection getConnection(){
         return connection;
+    }
+
+
+    // force override db connection
+    public static void overideDbConection() throws SQLException {
+        db = new DbConnection();
+    }
+
+    // use database - go into to specific db
+    public static void useDb(String dbName){
+
+        String sql = "USE "+dbName+";";
+        try {
+            DbConnection.getInstance().getConnection().createStatement().executeUpdate(sql);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

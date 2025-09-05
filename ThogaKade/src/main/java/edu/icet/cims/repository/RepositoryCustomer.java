@@ -1,6 +1,6 @@
 package edu.icet.cims.repository;
 
-import edu.icet.cims.db.DBConnection;
+import edu.icet.cims.db.DbConnection;
 import edu.icet.cims.model.entity.CustomerEntity;
 
 import java.sql.PreparedStatement;
@@ -16,7 +16,7 @@ public class RepositoryCustomer {
     public ArrayList<CustomerEntity> getCustomerEntityList() throws SQLException {
 
         String sql = "SELECT * FROM customer";
-        Statement stm = DBConnection.getInstance().getConnection().createStatement();
+        Statement stm = DbConnection.getInstance().getConnection().createStatement();
         ResultSet rst = stm.executeQuery(sql);
 
         ArrayList<CustomerEntity> entityList =  new ArrayList<>();
@@ -40,7 +40,7 @@ public class RepositoryCustomer {
     public boolean deleteCustomer(String custID) throws SQLException {
         String sql = "DELETE FROM customer WHERE Customer_Id=?";
 
-        PreparedStatement stm = DBConnection.getInstance().getConnection().prepareStatement(sql);
+        PreparedStatement stm = DbConnection.getInstance().getConnection().prepareStatement(sql);
         stm.setObject(1,custID);
         return stm.executeUpdate() > 0;
     }

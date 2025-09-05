@@ -1,6 +1,6 @@
 package edu.icet.cims.repository;
 
-import edu.icet.cims.db.DBConnection;
+import edu.icet.cims.db.DbConnection;
 import edu.icet.cims.model.dto.ActiveUserDTO;
 import edu.icet.cims.model.entity.UserCredentialsEntity;
 
@@ -28,7 +28,7 @@ public class RepositoryCredentials {
         String sql = "SELECT user_id, name FROM user_credentials WHERE username=? AND password=?";
 
         try {
-            PreparedStatement stm = DBConnection.getInstance().getConnection().prepareStatement(sql);
+            PreparedStatement stm = DbConnection.getInstance().getConnection().prepareStatement(sql);
             stm.setObject(1, credEntity.getUsername());
             stm.setObject(2, credEntity.getPassword());
             ResultSet rst = stm.executeQuery();
