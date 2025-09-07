@@ -1,5 +1,7 @@
 database:
-  password: fgnfn
-  name: nfnffn
-  user: fgnfgng
-  url: fngnf
+  pswd: '1234'
+  port: '3306'
+  dbName: thogakade_cims
+  parameter: ''
+  host: localhost
+  user: root
