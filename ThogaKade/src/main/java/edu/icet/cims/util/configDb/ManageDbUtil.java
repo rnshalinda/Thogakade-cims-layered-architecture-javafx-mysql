@@ -14,7 +14,7 @@ public class ManageDbUtil {
     private static Map<String, List<String>> requiredTables = Map.of(
             "customer", List.of("Customer_Id", "Title", "Name", "Dob", "Address", "City", "Province", "Postal_Code"),
             "item", List.of("Item_Code", "Item_Description", "Pack_Size", "Unit_Price", "Qty"),
-            "user_credentials", List.of("user_id", "username", "password", "name")
+            "credentials", List.of("user_id", "username", "password", "name")
     );
 
     // get tables names
@@ -50,7 +50,7 @@ public class ManageDbUtil {
             "\tPRIMARY KEY(Item_Code)\n" +
             "\t);";
 
-    private static String user_credentials = "CREATE TABLE user_credentials(\n" +
+    private static String credentials = "CREATE TABLE credentials(\n" +
             "\tuser_id VARCHAR(10),\n" +
             "\tusername VARCHAR(50) UNIQUE,\n" +
             "\tpassword VARCHAR(50),\n" +
@@ -67,8 +67,8 @@ public class ManageDbUtil {
         return customer;
     }
     // get user-credentials table string
-    public static String getUser_credentialsTbl() {
-        return user_credentials;
+    public static String getCredentialsTbl() {
+        return credentials;
     }
 
     // create database
@@ -93,7 +93,7 @@ public class ManageDbUtil {
         // execute for each element ("Table") in ArrayList
         for (String element : dbStrcture){
 
-            String sql = (element.equalsIgnoreCase("item")) ? getItemTbl() : (element.equalsIgnoreCase("customer")) ? getCustomerTbl() : (element.equalsIgnoreCase("user_credentials")) ? getUser_credentialsTbl() : null;
+            String sql = (element.equalsIgnoreCase("item")) ? getItemTbl() : (element.equalsIgnoreCase("customer")) ? getCustomerTbl() : (element.equalsIgnoreCase("credentials")) ? getCredentialsTbl() : null;
 
             if(sql != null && !sql.isBlank()){
 

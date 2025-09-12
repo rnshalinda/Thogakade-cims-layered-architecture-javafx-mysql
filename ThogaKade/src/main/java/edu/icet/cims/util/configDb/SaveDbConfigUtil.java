@@ -1,6 +1,6 @@
 package edu.icet.cims.util.configDb;
 
-import edu.icet.cims.model.dto.DbConfigDTO;
+import edu.icet.cims.model.dto.DbConfigDto;
 
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
@@ -23,7 +23,7 @@ public class SaveDbConfigUtil {
 //      parameter: ''
 
 
-    public static boolean saveToYlm(DbConfigDTO dbConfig){
+    public static boolean saveToYlm(DbConfigDto dbConfig){
 
         Map<String, Object> database = new HashMap<>();
         database.put("host", dbConfig.getHost());
@@ -43,7 +43,7 @@ public class SaveDbConfigUtil {
 
         Yaml yaml = new Yaml(options);
 
-        try (FileWriter writer = new FileWriter("dbConfig.yml")) {
+        try (FileWriter writer = new FileWriter("src/main/resources/db-config.yml")) {
             yaml.dump(root, writer);    // write to yml
             return true;                // return success
         } catch (IOException e) {

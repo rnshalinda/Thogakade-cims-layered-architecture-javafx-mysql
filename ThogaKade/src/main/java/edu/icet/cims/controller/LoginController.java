@@ -1,9 +1,11 @@
 package edu.icet.cims.controller;
 
-import edu.icet.cims.db.dbConfig;
+import edu.icet.cims.db.DbConfig;
 import edu.icet.cims.model.dto.*;
-import edu.icet.cims.service.*;
 
+import edu.icet.cims.service.ServiceCredential;
+import edu.icet.cims.service.exception.UserCredentialsException;
+import edu.icet.cims.service.impl.ServiceCredentialsImpl;
 import edu.icet.cims.util.AlertPopupUtil;
 import edu.icet.cims.util.SessionUserUtil;
 import edu.icet.cims.util.WindowManagerUtil;
@@ -21,8 +23,6 @@ import java.io.IOException;
 
 public class LoginController{
 
-    private ServiceCredentials service = new ServiceCredentials();
-
     @FXML
     private Button btn_cancel;
 
@@ -38,6 +38,10 @@ public class LoginController{
     @FXML
     private TextField txt_uname;
 
+
+    private ServiceCredential serviceCredInterface = new ServiceCredentialsImpl();      // interface type = service object type
+
+
     @FXML
     void btn_CancelAction(ActionEvent event) {
         Platform.exit();
@@ -46,23 +50,25 @@ public class LoginController{
     @FXML
     void btn_LoginAction(ActionEvent event) throws IOException {
 
-        // checks if Database available
+        // checks if Database available,
         // if available launch login window
         // otherwise attempt to create database
 
         // txt fields check - not empty
         if(initialFieldValidation()){
+
             // load db config from ymal file
             if(LoadDbConfigUtil.loadDbConfig()){
+
                 // check if such db exist
-                if(DbCheckUtil.isDbAvailable( dbConfig.getDbConfigData().getDbName() )){
+                if(DbCheckUtil.isDbAvailable( DbConfig.getDbConfigData().getDbName() )){
                     proceedToLogin(event);  // login
                 }
                 else {
-                    AlertPopupUtil.alertMsg(Alert.AlertType.WARNING, "Database '"+ dbConfig.getDbConfigData().getDbName()+"', not available, Please configure database access details.");
+                    AlertPopupUtil.alertMsg(Alert.AlertType.WARNING, "Database '"+ DbConfig.getDbConfigData().getDbName()+"', not available, Please configure database access details.");
                 }
             }
-            else AlertPopupUtil.alertMsg(Alert.AlertType.ERROR, "Unable to load db configuration (dbConfig.yml)");
+            else AlertPopupUtil.alertMsg(Alert.AlertType.ERROR, "Unable to load db configuration (db-config.yml)");
         }
         else AlertPopupUtil.alertMsg(Alert.AlertType.WARNING, "Fields cannot be empty");
 
@@ -73,23 +79,26 @@ public class LoginController{
         WindowManagerUtil.switchScene(event, "/view/configDB/ConfigDbAccess.fxml");
     }
 
+
+
+
     // txt field validation - ui level
     private boolean initialFieldValidation(){
         return !txt_uname.getText().isEmpty() && !txt_pswd.getText().isEmpty();
     }
 
+
     // check login
-    private void proceedToLogin(ActionEvent event) throws IOException {
+    private void proceedToLogin(ActionEvent event){
+        try {
+            UserCredentialsDto userDTO = new UserCredentialsDto(txt_uname.getText(), txt_pswd.getText());
 
-        UserCredentialsDTO userDTO = new UserCredentialsDTO(txt_uname.getText(), txt_pswd.getText());
-        ActiveUserDTO user = service.credentialsValidate(userDTO);                      // validate user with username, pswd and get user id, name
+            serviceCredInterface.credentialsValidate(userDTO);              // validate user with username, pswd and get user id, name
 
-        if (user != null) {
-            SessionUserUtil.setLoggedUser(user);                                        // display current user
-            WindowManagerUtil.switchScene(event, "/view/Dashboard.fxml");      // open dashboard
-        } else {
-            AlertPopupUtil.alertMsg(Alert.AlertType.ERROR, "Incorrect Password or Username");   // moved to separate dialog box class
+            WindowManagerUtil.switchScene(event, "/view/Dashboard.fxml");           // open dashboard
+
+        } catch (UserCredentialsException | IOException e) {
+            AlertPopupUtil.alertMsg(Alert.AlertType.WARNING, e.getMessage());
         }
-
     }
 }

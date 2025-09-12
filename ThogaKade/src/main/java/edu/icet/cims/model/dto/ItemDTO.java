@@ -7,7 +7,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-public class ItemDTO {
+public class ItemDto {
 
     private String code;
     private String description;

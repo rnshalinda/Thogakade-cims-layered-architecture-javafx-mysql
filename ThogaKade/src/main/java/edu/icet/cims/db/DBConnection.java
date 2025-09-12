@@ -15,12 +15,12 @@ public class DbConnection {
 
         connection = DriverManager.getConnection(
                 // url - general connection,
-                // connection doesn't contain end-point (dbname), why? to make the connection dynamic and accept queries that are not specific for a db.
-                "jdbc:mysql://"+dbConfig.getDbConfigData().getHost()+":"+dbConfig.getDbConfigData().getPort()+"/",
+                // connection doesn't contain end-point (dbname), why? to make the connection dynamic and accept queries that are not specific for a db
+                "jdbc:mysql://"+ DbConfig.getDbConfigData().getHost()+":"+ DbConfig.getDbConfigData().getPort()+"/",
                 // user
-                dbConfig.getDbConfigData().getUser(),
+                DbConfig.getDbConfigData().getUser(),
                 // pswd
-                dbConfig.getDbConfigData().getPswd()
+                DbConfig.getDbConfigData().getPswd()
         );
     }
 

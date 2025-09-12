@@ -13,7 +13,7 @@ public class RepositoryItem {
 
         ArrayList<ItemEntity> entityList = new ArrayList<>();
 
-        String sql = "SELECT * FROM item";
+        String sql = "SELECT * FROM item;";
 
         Statement stm = DbConnection.getInstance().getConnection().createStatement();
         ResultSet rst = stm.executeQuery(sql);
@@ -37,11 +37,11 @@ public class RepositoryItem {
     // delete item from DB
     public boolean deleteItem(String itemCode) throws SQLException {
 
-        String sql = "DELETE FROM item WHERE Item_Code=?";
+        String sql = "DELETE FROM item WHERE Item_Code=?;";
 
         PreparedStatement stm = DbConnection.getInstance().getConnection().prepareStatement(sql);
         stm.setObject(1,itemCode);
-//        System.out.println(stm.executeUpdate() > 0);
+
         return stm.executeUpdate() > 0;
     }
 
@@ -50,7 +50,7 @@ public class RepositoryItem {
     // Add new item record to DB
     public boolean addNewItem(ItemEntity entity) throws SQLException {
 
-        String sql = "INSERT INTO item (Item_Code, Item_Description, Pack_Size, Unit_Price, Qty) VALUES (?,?,?,?,?)";
+        String sql = "INSERT INTO item (Item_Code, Item_Description, Pack_Size, Unit_Price, Qty) VALUES (?,?,?,?,?);";
 
         PreparedStatement stm = DbConnection.getInstance().getConnection().prepareStatement(sql);
         stm.setObject(1, entity.getItemCode());
@@ -59,7 +59,7 @@ public class RepositoryItem {
         stm.setObject(4, entity.getUnitPrice());
         stm.setObject(5, entity.getQtyOnHand());
 
-        return stm.executeUpdate() > 0;     // if add successful return 1 = true
+        return stm.executeUpdate() > 0;     // if add successful stm returns 1 = true
     }
 
 
@@ -72,7 +72,7 @@ public class RepositoryItem {
                 "Pack_Size=?, "+
                 "Unit_Price=?, " +
                 "Qty=? " +
-                "WHERE Item_Code=?";
+                "WHERE Item_Code=?;";
 
         PreparedStatement stm = DbConnection.getInstance().getConnection().prepareStatement(sql);
         stm.setObject(1, entity.getDescription());
@@ -88,6 +88,7 @@ public class RepositoryItem {
 
     // Check if item alredy sxist in DB
     public boolean itemExistCheck(String itemCode) throws SQLException {
+
         String sql = "SELECT EXISTS(" +
                 "SELECT 1 " +
                 "FROM item " +

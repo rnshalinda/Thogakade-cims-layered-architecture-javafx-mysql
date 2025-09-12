@@ -2,12 +2,14 @@ package edu.icet.cims.controller.configDb;
 
 import edu.icet.cims.controller.util.ConfirmationWindowController;
 import edu.icet.cims.db.DbConnection;
-import edu.icet.cims.db.dbConfig;
-import edu.icet.cims.model.dto.DbConfigDTO;
+import edu.icet.cims.db.DbConfig;
+import edu.icet.cims.model.dto.DbConfigDto;
 import edu.icet.cims.util.AlertPopupUtil;
 import edu.icet.cims.util.WindowManagerUtil;
+import edu.icet.cims.util.configDb.InsertDbDataUtil;
 import edu.icet.cims.util.configDb.ManageDbUtil;
 import edu.icet.cims.util.configDb.DbCheckUtil;
+import edu.icet.cims.util.configDb.SaveDbConfigUtil;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -30,7 +32,13 @@ import java.util.ResourceBundle;
 public class CreateDbController implements Initializable {
 
     @FXML
-    private Button btn_add;
+    private Button btn_addTbl;
+
+    @FXML
+    private Button btn_addData;
+
+    @FXML
+    private Button btn_remove;
 
     @FXML
     private Button btn_changeDbName;
@@ -45,7 +53,13 @@ public class CreateDbController implements Initializable {
     private CheckBox chkBox_defaultDbName;
 
     @FXML
-    private ComboBox<String> comboBox_selectTbl;
+    private CheckBox chkBox_populateTbl;
+
+    @FXML
+    private ComboBox<String> comboBox1_selectTbl;
+
+    @FXML
+    private ComboBox<String> comboBox2_selectTbl;
 
     @FXML
     private StackPane stackPane_contentArea;
@@ -57,26 +71,13 @@ public class CreateDbController implements Initializable {
     private TextField txt_dbName;
 
 
+
     String newDbName = "";       // new dbName holder
 
     // db Structure List
     // contains -> { dbName, tbl1, tbl2, tbl3.... } ** must start with dbName
-    ArrayList<String> dbStructure = new ArrayList<>();
-
-
-    // add tables to db structure
-    @FXML
-    void btn_addAction(ActionEvent event) {
-        // check if selection combo-box not null
-        if(comboBox_selectTbl.getValue() != null){
-
-            dbStructure.add(comboBox_selectTbl.getValue());                         // append selected combo-box value(table) to dbStructure list
-
-            viewDbStructure(dbStructure);                                           // preview db structure in stack-pane area
-
-            comboBox_selectTbl.getItems().remove(comboBox_selectTbl.getValue());    // remove item from selection combo-box once added
-        }
-    }
+    ArrayList<String> dbStructure = new ArrayList<>();              // contain db tbl structure
+    ArrayList<String> addDataTblList = new ArrayList<>();           // contain selected tables to add data
 
 
     // change dbName
@@ -85,8 +86,51 @@ public class CreateDbController implements Initializable {
 
         newDbName = txt_dbName.getText();       // new dbName
         editDbStructureList();                  // update db Structure List - replace first element dbName with new name
-        viewDbStructure(dbStructure);
+        viewDbStructure(dbStructure, addDataTblList);
     }
+
+
+    // add tables to db structure
+    @FXML
+    void btn_addTblAction(ActionEvent event) {
+
+        // check if selection combo-box not null
+        if(comboBox1_selectTbl.getValue() != null){
+
+            dbStructure.add(comboBox1_selectTbl.getValue());                        // append selected combo-box value(table name) to dbStructure list
+
+            viewDbStructure(dbStructure, addDataTblList);                           // preview db structure in stack-pane area
+
+            comboTables2.add(comboBox1_selectTbl.getValue());                       // update combo-box2 selection
+            updateSelectComboBox2(dbStructure, addDataTblList);
+
+            comboBox1_selectTbl.getItems().remove(comboBox1_selectTbl.getValue());  // remove item from selection combo-box once added
+
+        }
+
+        removeBtnState();       // change remove btn state
+    }
+
+
+    // remove items form stack-pane area and re populate selection combo
+    @FXML
+    void btn_removeAction(ActionEvent event) {
+
+        if(dbStructure.toArray().length > 1) {
+
+            comboTables1.add(dbStructure.getLast());                // get last added element to dbStructure and add it to combo
+            if(!addDataTblList.isEmpty()) removeElementFromAddDataTblList(dbStructure.getLast());     // update data add pending tbl list
+
+            dbStructure.removeLast();                               // remove that last element from dbStructure
+
+            viewDbStructure(dbStructure, addDataTblList);           // view in stack-pane
+
+            updateSelectComboBox2(dbStructure, addDataTblList);     // update comboxo 2
+        }
+
+        removeBtnState();       // change remove btn state
+    }
+
 
 
     // create db
@@ -100,27 +144,39 @@ public class CreateDbController implements Initializable {
             if (!chkBox_defaultDbName.isSelected()) {
 
                 // store new DbConfigDTO in dbConfig.setDbConfigData()
-                dbConfig.setDbConfigData(new DbConfigDTO(dbConfig.getDbConfigData().getHost() ,newDbName, dbConfig.getDbConfigData().getUser(), dbConfig.getDbConfigData().getPswd(), dbConfig.getDbConfigData().getPort(), dbConfig.getDbConfigData().getExtraParam()));
+                DbConfig.setDbConfigData(new DbConfigDto(DbConfig.getDbConfigData().getHost() ,newDbName, DbConfig.getDbConfigData().getUser(), DbConfig.getDbConfigData().getPswd(), DbConfig.getDbConfigData().getPort(), DbConfig.getDbConfigData().getExtraParam()));
             }
 
             // create database
             // check if db with user given name already exist
-            if ( DbCheckUtil.isDbAvailable( dbConfig.getDbConfigData().getDbName()) ) {
+            if ( DbCheckUtil.isDbAvailable( DbConfig.getDbConfigData().getDbName()) ) {
 
-                ArrayList dbList = DbCheckUtil.checkDbTblExist(dbConfig.getDbConfigData().getDbName());      //if db exist, return list containing existing tables
-                dbList.addFirst(dbConfig.getDbConfigData().getDbName());                                     // push existing db name as first element
+                ArrayList dbList = DbCheckUtil.checkDbTblExist(DbConfig.getDbConfigData().getDbName());      // if db exist, return list containing existing tables
+                dbList.addFirst(DbConfig.getDbConfigData().getDbName());                                     // push existing db name as first element
 
                 // Ask user confirmation, Yes/No
                 if (launchConfirmWindow( dbList )) {      // if 'yes' execute below
 
                     // delete existing db
                     if (dropDbMethod()) {
-
                         // and create new create db
-                        createDbMethod();
+                        if(createDbMethod()){
+                            // create tables
+                            if(createTblMethod()){
+                                // pupate tables with dummy data
+                                if(populateTblData()){
 
-                        // create tables
-                        createTblMethod();
+                                    if(!SaveDbConfigUtil.saveToYlm(DbConfig.getDbConfigData())){
+
+                                        AlertPopupUtil.alertMsg(Alert.AlertType.ERROR, "Error caused while saving db-config.yml");
+
+                                    }else AlertPopupUtil.alertMsg(Alert.AlertType.CONFIRMATION, "Database '"+ DbConfig.getDbConfigData().getDbName()+"' created successfully.\n\nTables,\n->"+(DbCheckUtil.checkDbTblExist( DbConfig.getDbConfigData().getDbName() ))+"\n\nData added to tables successful");
+                                }
+                                else   AlertPopupUtil.alertMsg(Alert.AlertType.INFORMATION, "Database '"+ DbConfig.getDbConfigData().getDbName()+"' created with empty tables.\n\nTables,\n->"+(DbCheckUtil.checkDbTblExist( DbConfig.getDbConfigData().getDbName() )));
+
+                            }else   AlertPopupUtil.alertMsg(Alert.AlertType.ERROR, "Could not create tables.");
+
+                        } else   AlertPopupUtil.alertMsg(Alert.AlertType.ERROR,"Could not create '"+ DbConfig.getDbConfigData().getDbName()+"' database");
                     }
                 }
                 // if 'No' close the window without doing anything
@@ -128,12 +184,12 @@ public class CreateDbController implements Initializable {
             // if it doesn't exist, go straight to create new db
             else {
                 createDbMethod();
-                DbConnection.useDb( dbConfig.getDbConfigData().getDbName());
+                DbConnection.useDb( DbConfig.getDbConfigData().getDbName());
                 createTblMethod();
             }
         }
-        // if user had not add tables show warning
-        else AlertPopupUtil.alertMsg(Alert.AlertType.WARNING, "You have not selected any tables.");
+        // if user not add tables show warning
+        else AlertPopupUtil.alertMsg(Alert.AlertType.WARNING, "You have not added any tables.");
     }
 
 
@@ -144,41 +200,67 @@ public class CreateDbController implements Initializable {
     }
 
 
+    @FXML
+    void btn_addDataToTblAction(ActionEvent event) throws Exception {
+
+        if(comboBox2_selectTbl.getValue() != null){
+
+            addDataTblList.add(comboBox2_selectTbl.getValue());
+
+            viewDbStructure(dbStructure, addDataTblList);                           //  overloaded methode, passed the selected tbl name
+
+            comboBox2_selectTbl.getItems().remove(comboBox2_selectTbl.getValue());  // remove item from selection combo-box once added
+        }
+    }
+
+
     // default db name check-box
     @FXML
     void chkBox_defaultDbNameAction(ActionEvent event) {
         changeDbNameState();                                        // enable/disable dbName txt, change btn
         if(chkBox_defaultDbName.isSelected()) {
-            newDbName = dbConfig.getDbConfigData().getDbName();     // reassign default db name from yml as newDbName
+            newDbName = DbConfig.getDbConfigData().getDbName();     // reassign default db name from yml as newDbName
             editDbStructureList();                                  // update db Structure list - replace first element
         }
     }
 
 
+    @FXML
+    void chkBox_populateTblAction(ActionEvent event) {
+        populateDbTblState();                                       // enable / disable fields
+    }
+
+
     // populate preview with sql are when selecting combo value
     @FXML
-    void comboBox_selectTblAction(ActionEvent event) {
+    void comboBox1_selectTblAction(ActionEvent event) {
         txtArea_sqlQuery.setWrapText(true);
 
-        if(comboBox_selectTbl.getValue() != null) {
-            txtArea_sqlQuery.setText(getSql(comboBox_selectTbl.getValue()));    // get table sql string and show in preview area
+        if(comboBox1_selectTbl.getValue() != null) {
+            txtArea_sqlQuery.setText(getSql(comboBox1_selectTbl.getValue()));    // get table sql string and show in preview area
         }
-
     }
+
 
 
     // initially apply these settings
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
 
+        comboBox2_selectTbl.setDisable(true);
+        btn_addData.setDisable(true);
+
+        // disable remove tables
+        btn_remove.setDisable(true);
+
         // push the current dbName in DbConfigDTO to dbStructure list as first element
-        dbStructure.add(dbConfig.getDbConfigData().getDbName());
+        dbStructure.add(DbConfig.getDbConfigData().getDbName());
 
         // add table selections to combo-box comboBox_selectTbl
-        loadSelectCombobox();
+        loadSelectComboBox();
 
         // set current db name as default name in check-box
-        chkBox_defaultDbName.setText("default name '"+ dbConfig.getDbConfigData().getDbName());
+        chkBox_defaultDbName.setText("default name '"+ DbConfig.getDbConfigData().getDbName());
         chkBox_defaultDbName.setSelected(true);     // select check-box
 
         // dbNAme txt, change btn initial active state
@@ -198,33 +280,65 @@ public class CreateDbController implements Initializable {
     }
 
 
+
+    ObservableList<String> comboTables1 = FXCollections.observableArrayList();
     // set values to combo box
-    private void loadSelectCombobox(){
-        ObservableList<String> tables = FXCollections.observableArrayList();
-//        tables.addAll("customer", "item", "user_credentials");
-        tables.addAll(ManageDbUtil.getRequiredTableNames());    // get tables names as list from ManageDbUtil
-        comboBox_selectTbl.setItems(tables);
+    private void loadSelectComboBox(){
+        comboTables1.addAll(ManageDbUtil.getRequiredTableNames());       // get tables names as list from ManageDbUtil
+        comboBox1_selectTbl.setItems(comboTables1);
     }
 
-    // get select table combo box sql
+
+
+    ObservableList<String> comboTables2 = FXCollections.observableArrayList();
+    // update combo box 2
+    private void updateSelectComboBox2(ArrayList<String> dbStructure, ArrayList<String> addDataTblList){
+        comboTables2.clear();
+        if( dbStructure.toArray().length > 1 ) {
+            for(int i = 1; i < dbStructure.toArray().length; i++){
+
+                if(!addDataTblList.contains( dbStructure.get(i) )){
+                    comboTables2.add( dbStructure.get(i) );
+                }
+            }
+        }
+
+        if(!comboTables2.isEmpty()) {
+            comboBox2_selectTbl.setItems(comboTables2);
+        }
+    }
+
+    // remove element from addDataTblList
+    private void removeElementFromAddDataTblList(String element){
+        if(addDataTblList.contains(element)){
+            addDataTblList.remove(element);
+        }
+    }
+
+
+
+    // get sql query for selected table in combo-box, to display in stack-pane area
     private String getSql(String str){
         if (str.equalsIgnoreCase("item")) return ManageDbUtil.getItemTbl();
         if (str.equalsIgnoreCase("customer")) return ManageDbUtil.getCustomerTbl();
-        if (str.equalsIgnoreCase("user_credentials")) return ManageDbUtil.getUser_credentialsTbl();
+        if (str.equalsIgnoreCase("credentials")) return ManageDbUtil.getCredentialsTbl();
         return null;
     }
 
 
     // preview area for db structure - dbName, tables
-    private void viewDbStructure(ArrayList<String> dbList){
-        // print db structure to stack-pane TextArea
-        for(int i = 0; i < dbList.toArray().length; i++){
+    // overloaded methode
+    private void  viewDbStructure(ArrayList<String> dbTblList, ArrayList<String> addDataTblList){
+        for(int i = 0; i < dbTblList.toArray().length; i++){
 
-            if(i == 0) txtArea_sqlQuery.setText("db - "+(String) dbList.toArray()[i++]);          // setText - clear text area set  first [i==0] element of list
+            if(i == 0)  txtArea_sqlQuery.setText("db - "+ dbTblList.get(i));                                    // setText - clear text area set  first [i==0] element of list
 
-            // if dbList array has more than 1 element continue
-            if(dbList.toArray().length > 1) {
-                txtArea_sqlQuery.appendText("\n\t|-->" + (String) dbList.toArray()[i] + " (table)");  // append every-other list element as new line text
+            else {
+                if(addDataTblList.contains( dbTblList.get(i) )){
+                    txtArea_sqlQuery.appendText("\n\t|-->" + dbTblList.get(i) + " (table - pending data)");   // append every-other list element as new line text
+                }
+                else txtArea_sqlQuery.appendText("\n\t|-->" + dbTblList.get(i) + " (table - empty)");         // append every-other list element as new line text
+
             }
         }
     }
@@ -245,8 +359,8 @@ public class CreateDbController implements Initializable {
         // Get the controller created by FXMLLoader
         ConfirmationWindowController boolWindow = loader.getController();
 
-        boolWindow.setStackpane(dbList);                                  // pass list elements to set stack-pane
-        boolWindow.setHeading("Database already exists, Replace?");     // window heading methode
+        boolWindow.setStackpane(dbList);                                    // pass list elements to set stack-pane
+        boolWindow.setHeading("Database already exists, Replace?");         // window heading methode
 
         // Show the new scene
         Stage stage = new Stage();
@@ -260,30 +374,57 @@ public class CreateDbController implements Initializable {
 
 
     // create db inner method
-    private void createDbMethod(){
-        if(ManageDbUtil.createDB( dbConfig.getDbConfigData().getDbName()) ){
-            AlertPopupUtil.alertMsg(Alert.AlertType.CONFIRMATION, "Database '"+dbConfig.getDbConfigData().getDbName()+"' created successfully.");
-        }
-        else AlertPopupUtil.alertMsg(Alert.AlertType.ERROR,"Could not create '"+dbConfig.getDbConfigData().getDbName()+"' database");
+    private boolean createDbMethod(){
+        return (ManageDbUtil.createDB( DbConfig.getDbConfigData().getDbName()) ) ? true : false;
     }
 
 
     // create tables inner method
-    private void createTblMethod(){
-
-        if(ManageDbUtil.createTables(dbStructure)){
-            AlertPopupUtil.alertMsg(Alert.AlertType.CONFIRMATION, "Successfully created tables. \n"+(DbCheckUtil.checkDbTblExist( dbConfig.getDbConfigData().getDbName() ).toString()) );
-        }
-        else AlertPopupUtil.alertMsg(Alert.AlertType.ERROR, "Could not create tables.");
-
+    private boolean createTblMethod(){
+        return (ManageDbUtil.createTables(dbStructure)) ? true : false;
     }
 
 
     // delete db inner method
     private boolean dropDbMethod(){
-        if( ManageDbUtil.dropDb( dbConfig.getDbConfigData().getDbName()) ){
+        if( ManageDbUtil.dropDb( DbConfig.getDbConfigData().getDbName()) ){
             return true;
         }
-        else AlertPopupUtil.alertMsg(Alert.AlertType.ERROR, "Could not delete db '"+dbConfig.getDbConfigData().getDbName()+"'");    return false;
+        else AlertPopupUtil.alertMsg(Alert.AlertType.ERROR, "Could not delete db '"+ DbConfig.getDbConfigData().getDbName()+"'");    return false;
     }
+
+
+    // populate tables with data
+    private boolean populateTblData(){
+
+        if(!addDataTblList.isEmpty() && chkBox_populateTbl.isSelected()) {
+            return InsertDbDataUtil.runSeedQueries(addDataTblList);
+        }
+        return false;
+    }
+
+
+    // change remove btn state -  activate only if tattletale 1 tbl added
+    private void removeBtnState(){
+
+        if(dbStructure.toArray().length > 1){
+            btn_remove.setDisable(false);
+        }
+        else btn_remove.setDisable(true);
+    }
+
+
+    // check box populate tables state
+    private void populateDbTblState(){
+
+        if(chkBox_populateTbl.isSelected()){
+            comboBox2_selectTbl.setDisable(false);
+            btn_addData.setDisable(false);
+        }
+        else{
+            comboBox2_selectTbl.setDisable(true);
+            btn_addData.setDisable(true);
+        }
+    }
+
 }

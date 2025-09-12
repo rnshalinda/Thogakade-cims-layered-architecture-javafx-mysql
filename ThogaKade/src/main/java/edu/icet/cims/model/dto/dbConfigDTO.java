@@ -8,7 +8,7 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 
-public class DbConfigDTO {
+public class DbConfigDto {
 
     private String host;
     private String dbName;

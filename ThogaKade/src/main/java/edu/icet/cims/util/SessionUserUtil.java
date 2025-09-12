@@ -1,17 +1,17 @@
 package edu.icet.cims.util;
 
-import edu.icet.cims.model.dto.ActiveUserDTO;
+import edu.icet.cims.model.dto.ActiveUserDto;
 
 // Active user
 public class SessionUserUtil {
-    private static ActiveUserDTO loggedUser;
+    private static ActiveUserDto loggedUser;
 
     // set logged user
-    public static void setLoggedUser(ActiveUserDTO loggedUser) {
+    public static void setLoggedUser(ActiveUserDto loggedUser) {
         SessionUserUtil.loggedUser = loggedUser;
     }
     // set current user
-    public static ActiveUserDTO getLoggedUser() {
+    public static ActiveUserDto getLoggedUser() {
         return SessionUserUtil.loggedUser;
     }
 

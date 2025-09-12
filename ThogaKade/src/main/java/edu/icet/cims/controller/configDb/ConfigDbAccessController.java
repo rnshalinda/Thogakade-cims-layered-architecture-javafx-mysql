@@ -1,7 +1,7 @@
 package edu.icet.cims.controller.configDb;
 
-import edu.icet.cims.db.dbConfig;
-import edu.icet.cims.model.dto.DbConfigDTO;
+import edu.icet.cims.db.DbConfig;
+import edu.icet.cims.model.dto.DbConfigDto;
 import edu.icet.cims.util.AlertPopupUtil;
 import edu.icet.cims.util.WindowManagerUtil;
 import edu.icet.cims.util.configDb.DbCheckUtil;
@@ -12,8 +12,6 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
-import lombok.Getter;
-import lombok.Setter;
 
 import java.io.IOException;
 import java.net.URL;
@@ -84,19 +82,19 @@ public class ConfigDbAccessController implements Initializable {
 
         // if all fields not null and not empty proceed to dbConfigDTO otherwise show empty field alert
         // note extraParam not checked here, because its optional and can be empty
-        if(initialFieldValidation(dbName, port, user, pswd, host)){
+        if( initialFieldValidation(dbName, port, user, pswd, host) ){
 
             // set DbConfigDTO to dbConfig
-            dbConfig.setDbConfigData(new DbConfigDTO(host, dbName, user, pswd, port, extraParam));
+            DbConfig.setDbConfigData(new DbConfigDto(host, dbName, user, pswd, port, extraParam));
 
             // check if db empty
-            if(DbCheckUtil.isDbAvailable( dbConfig.getDbConfigData().getDbName() )){
+            if( DbCheckUtil.isDbAvailable(DbConfig.getDbConfigData().getDbName()) ){
 
                 // check if db data exist, return tables names in db  [table 1, table 2, table 3]
-                ArrayList<String> existingDbTableNames = DbCheckUtil.checkDbTblExist(dbConfig.getDbConfigData().getDbName());
+                ArrayList<String> existingDbTableNames = DbCheckUtil.checkDbTblExist( DbConfig.getDbConfigData().getDbName() );
 
-                if(existingDbTableNames != null && dbStructureMatches(existingDbTableNames)){
-                    AlertPopupUtil.alertMsg(Alert.AlertType.ERROR, "Successful!\nExisting database matches required structure.\n\n"+dbConfig.getDbConfigData().getDbName()+"\n\t|-> customer : "+ManageDbUtil.getRequiredColumnNames("cutomer")+"\n\t|-> item : "+ManageDbUtil.getRequiredColumnNames("item")+"\n\t|-> user_credentials : "+ManageDbUtil.getRequiredColumnNames("user_credentials")+"\n\nPlease press configure button.");
+                if(existingDbTableNames != null && matchDbStructure(existingDbTableNames)){
+                    AlertPopupUtil.alertMsg(Alert.AlertType.CONFIRMATION, "Successful!\nExisting database matches expected table structure.\n\nPlease press configure button.");
                     btn_configure.setDisable(false);        // enable configure button
                 }
                 else {
@@ -118,13 +116,13 @@ public class ConfigDbAccessController implements Initializable {
     void btn_configureAction(ActionEvent event) throws IOException {
 
         // get current stored DbConfigDTO stored from dbConfig.getDbConfigData() and save as yml file to local file root
-        if(SaveDbConfigUtil.saveToYlm(dbConfig.getDbConfigData())){
+        if(SaveDbConfigUtil.saveToYlm(DbConfig.getDbConfigData())){
 
-            AlertPopupUtil.alertMsg(Alert.AlertType.CONFIRMATION, "Configuration saved to dbConfig.yml");   // if success display msg confirmation
+            AlertPopupUtil.alertMsg(Alert.AlertType.CONFIRMATION, "Configuration saved to db-config.yml");  // if success display msg confirmation
 
             WindowManagerUtil.switchScene(event, "/view/CIMS-Login.fxml");                              // redirect to log in window
         }
-        else AlertPopupUtil.alertMsg(Alert.AlertType.ERROR, "Cannot save data to dbConfig.yml");           // could not save display msg error
+        else AlertPopupUtil.alertMsg(Alert.AlertType.ERROR, "Error caused while saving db-config.yml");     // could not save display msg error
     }
 
 
@@ -197,8 +195,8 @@ public class ConfigDbAccessController implements Initializable {
     // check if txt fields are empty
     private boolean initialFieldValidation(String dbName, String port, String user, String pswd, String host){
         if (dbName == null || port == null || user == null || pswd == null || host == null) return false;                  // if fields null
-        if (dbName.isBlank() || port.isBlank() || user.isBlank() || pswd.isBlank() || host.isBlank()) return  false;     // if fields empty
-        if (!CommonValidatorUtil.isIntFormat(port)) return false;                                                                         // if port not numbers
+        if (dbName.isBlank() || port.isBlank() || user.isBlank() || pswd.isBlank() || host.isBlank()) return  false;       // if fields empty
+        if (!CommonValidatorUtil.isIntFormat(port)) return false;                                                          // if port not numbers
         return true;
     }
 
@@ -217,17 +215,17 @@ public class ConfigDbAccessController implements Initializable {
 //    }
 
 
-    private boolean dbStructureMatches(ArrayList<String> existingDbTableNames){
+    private boolean matchDbStructure(ArrayList<String> existingDbTableNames){
 
         // check db tables name matches
-        if(DbCheckUtil.matchTblName(existingDbTableNames, ManageDbUtil.getRequiredTableNames())){
+        if(DbCheckUtil.matchTblName(existingDbTableNames, ManageDbUtil.getRequiredTableNames())){           // match exciting tbl names with required
             // check each table columns
-            if(DbCheckUtil.matchTblColumn(existingDbTableNames, ManageDbUtil.getRequiredTableNames())){
+            if(DbCheckUtil.matchTblColumn(existingDbTableNames)){     // match those tbl column names with required
                 return true;
             }
-            else  AlertPopupUtil.alertMsg(Alert.AlertType.WARNING, "Found,'"+ dbConfig.getDbConfigData().getDbName()+"' database"+"\n\nTable columns does not match"+"\nExpected,\n\nCustomer table: \n->"+ManageDbUtil.getRequiredColumnNames("customer")+"\n\nitem table: \n->"+ManageDbUtil.getRequiredColumnNames("item")+"\n\nuser_credentials table: \n->"+ManageDbUtil.getRequiredColumnNames("user_credentials")+"\n\nPlease press create-db button.");
+            else  AlertPopupUtil.alertMsg(Alert.AlertType.WARNING, "Found database, '"+ DbConfig.getDbConfigData().getDbName()+"'"+"\n\nTable column mismatch"+"\n\nExpected,\n\nCustomer table: \n->"+ManageDbUtil.getRequiredColumnNames("customer")+"\n\nitem table: \n->"+ManageDbUtil.getRequiredColumnNames("item")+"\n\nuser_credentials table: \n->"+ManageDbUtil.getRequiredColumnNames("user_credentials")+"\n\nPlease create database.");
         }
-        else AlertPopupUtil.alertMsg(Alert.AlertType.WARNING, "Found,'"+ dbConfig.getDbConfigData().getDbName()+"' database,\nContain -> "+existingDbTableNames.toString()+"\nRequired -> "+ManageDbUtil.getRequiredTableNames().toString()+"\n\nFound database does not contain required tables. \n\nPlease press create-db button");
+        else AlertPopupUtil.alertMsg(Alert.AlertType.WARNING, "Found, '"+ DbConfig.getDbConfigData().getDbName()+"',\nContain -> "+existingDbTableNames.toString()+"\nRequired -> "+ManageDbUtil.getRequiredTableNames()+"\n\nDatabase does not contain required tables. \n\nPlease create database.");
 
         return false;
     }
@@ -236,7 +234,7 @@ public class ConfigDbAccessController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         btn_configure.setDisable(true);     // disable configure button
-        btn_createDb.setDisable(true);     // disable create db button
+        btn_createDb.setDisable(true);      // disable create db button
 
         txt_urlOptional.setDisable(true);
     }

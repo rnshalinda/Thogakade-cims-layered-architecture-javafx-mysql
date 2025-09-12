@@ -1,7 +1,9 @@
 package edu.icet.cims.controller;
 
-import edu.icet.cims.model.dto.ItemDTO;
+import edu.icet.cims.model.dto.ItemDto;
 import edu.icet.cims.service.ServiceItem;
+import edu.icet.cims.service.exception.ItemServiceException;
+import edu.icet.cims.service.impl.ServiceItemImpl;
 import edu.icet.cims.util.AlertPopupUtil;
 import edu.icet.cims.util.SessionUserUtil;
 import edu.icet.cims.util.WindowManagerUtil;
@@ -26,7 +28,7 @@ import java.util.ResourceBundle;
 
 public class ItemController implements Initializable {
 
-    ServiceItem service = new ServiceItem();
+    ServiceItem service = new ServiceItemImpl();
 
     @FXML
     private Button btn_delete;
@@ -69,7 +71,7 @@ public class ItemController implements Initializable {
     private Label lbl_ativeUserID;
 
     @FXML
-    private TableView<ItemDTO> tbl_itemsList;
+    private TableView<ItemDto> tbl_itemsList;
 
     @FXML
     private TextArea txtArea_description;
@@ -92,24 +94,28 @@ public class ItemController implements Initializable {
     @FXML
     private TextField txt_unitPrice;
 
+
+    // logout
     @FXML
     void btn_LogoutAction(ActionEvent event) throws IOException {
         SessionUserUtil.clearSessionUser();
         WindowManagerUtil.switchScene(event, "/view/CIMS-Login.fxml");
     }
 
-    @FXML
-    void btn_deleteAction(ActionEvent event) throws SQLException {
-        String status = service.deleteItemCall(txt_itemCode_Delete.getText().toUpperCase());
-        if(status.equalsIgnoreCase("successful")){
 
-            AlertPopupUtil.alertMsg(Alert.AlertType.CONFIRMATION, "Item delete "+status); // popup dialog box
+    // delete item
+    @FXML
+    void btn_deleteAction(ActionEvent event){
+
+        try {
+            service.deleteItemCall(txt_itemCode_Delete.getText().toUpperCase());
+
+            AlertPopupUtil.alertMsg(Alert.AlertType.CONFIRMATION, "Item deleted successfully");
             clearFields();      // clear all fields
             loadItemData();     // load updated table
-        }
-        else{
-            clearFields();      // clear all fields
-            AlertPopupUtil.alertMsg(Alert.AlertType.ERROR, status); // popup dialog box
+
+        } catch (ItemServiceException e) {
+            AlertPopupUtil.alertMsg(Alert.AlertType.ERROR, e.getMessage());     // popup dialog box
         }
     }
 
@@ -119,56 +125,55 @@ public class ItemController implements Initializable {
     }
 
     @FXML
-    void btn_updateStockAction(ActionEvent event) throws SQLException {
-//        RadioButton action = (RadioButton) radioToggleGroup.getSelectedToggle(); // if needed, can get value txt of selected radio btn
+    void btn_updateStockAction(ActionEvent event) {
 
-        String code = txt_itemCode.getText().toUpperCase();         // item code
-        String description = txtArea_description.getText();         // item description
-        String packSize = txt_packSize.getText();                   // Pack size
-        String price = txt_unitPrice.getText();                     // Unit price
-        String qty = txt_qty.getText();                             // Quantity on hand
+        //RadioButton action = (RadioButton) radioToggleGroup.getSelectedToggle(); // if needed, can get value txt of selected radio btn
+        String code = txt_itemCode.getText().toUpperCase();
+        String description = txtArea_description.getText();
+        String packSize = txt_packSize.getText();
+        String price = txt_unitPrice.getText();
+        String qty = txt_qty.getText();
 
-        String status = "Unknown error!";
-        boolean flag = false;
-        Alert.AlertType alertType = Alert.AlertType.ERROR;          // default AlertType ERROR
+        try {
+            if (initialFieldValidation(code, description, packSize, price, qty)) {
 
-        // initial validation of txt fields
-        if( initialFieldValidation(code, description, packSize, price, qty) ) {
-            // Item object
-            ItemDTO item =  new ItemDTO(code, description, packSize+comboBox_unit.getValue(), Double.parseDouble(price), Integer.parseInt(qty));
+                ItemDto item = new ItemDto( code, description, packSize + comboBox_unit.getValue(), Double.parseDouble(price), Integer.parseInt(qty) );
 
-            // txt fields format validation
-            status = service.fieldFormatValidation(item);
+                // validate fields (throws exception if invalid)
+                service.validateItemFields(item);
 
-            // if validate pass execute DB call
-            if(status.equalsIgnoreCase("valid")){
+                if (radioBtn_new.isSelected()) {                // add new item to DB
 
-                if(radioBtn_new.isSelected()){                      // add new item to DB
-                    status = service.addNewItem(item);              // returns confirm / error msg
-                    flag = true;
+                    service.addNewItem(item);
+
+                    AlertPopupUtil.alertMsg(Alert.AlertType.CONFIRMATION, "Item added successfully");
+                    clearFields();
+
+                } else if (radioBtn_update.isSelected()) {      // update item DB
+
+                    service.updateItem(item);
+
+                    AlertPopupUtil.alertMsg(Alert.AlertType.CONFIRMATION, "Item updated successfully");
+                    clearFields();
+
+                } else {                                        //  if neither is selected
+                    AlertPopupUtil.alertMsg(Alert.AlertType.WARNING, "Please select [New/Update]");
                 }
-                else if(radioBtn_update.isSelected()){              // update item DB
-                    status = service.updateItem(item);
-                    flag = true;
-                }
-                else{
-                    status = "Action not selected [New/Update]";    // if Action to perform not selected
-                    alertType = Alert.AlertType.WARNING;
-                }
+
+                loadItemData();
             }
-            // perform after DB update
-            if(flag){
-                alertType = Alert.AlertType.CONFIRMATION;
-                loadItemData();     // load updated table
-                clearFields();      // clear all fields
-            }
-            AlertPopupUtil.alertMsg( alertType, status );     // display msg dialog-box (errors, confirmations)
+        } catch (ItemServiceException e) {
+            AlertPopupUtil.alertMsg(Alert.AlertType.ERROR, e.getMessage());
         }
+
     }
+
 
     // Run at start of class
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+
+        rowSelect();                                                            // select tbl row on click
 
         btn_updateStock.setDefaultButton(true);                                 // default btn, keyboard Enter key
 
@@ -177,26 +182,27 @@ public class ItemController implements Initializable {
         unitsComboBox();                                                        // set units for pack size
 
         // Execute populate item table command
-        try {
-            loadItemData();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
+        loadItemData();
+
     }
 
     // execute load table data call from DB
-    private void loadItemData() throws SQLException {
+    private void loadItemData() {
+        try{
+            ObservableList<ItemDto> list = FXCollections.observableArrayList(
+                    service.getItemDTOList());
 
-        ObservableList<ItemDTO> list = FXCollections.observableArrayList(
-                service.getItemDTOList());
+            col_itemCode.setCellValueFactory(new PropertyValueFactory<>("code"));
+            col_description.setCellValueFactory(new PropertyValueFactory<>("description"));
+            col_packSize.setCellValueFactory(new PropertyValueFactory<>("packSize"));
+            col_unitPrice.setCellValueFactory(new PropertyValueFactory<>("unitPrice"));
+            col_qty.setCellValueFactory(new PropertyValueFactory<>("qty"));
 
-        col_itemCode.setCellValueFactory(new PropertyValueFactory<>("code"));
-        col_description.setCellValueFactory(new PropertyValueFactory<>("description"));
-        col_packSize.setCellValueFactory(new PropertyValueFactory<>("packSize"));
-        col_unitPrice.setCellValueFactory(new PropertyValueFactory<>("unitPrice"));
-        col_qty.setCellValueFactory(new PropertyValueFactory<>("qty"));
-
-        tbl_itemsList.setItems(list);
+            tbl_itemsList.setItems(list);
+        }
+        catch (ItemServiceException e){
+            AlertPopupUtil.alertMsg(Alert.AlertType.ERROR, e.getMessage());
+        }
     }
 
     // set units in comboBox_unit for packSize
@@ -238,4 +244,24 @@ public class ItemController implements Initializable {
         return false;                                                   // if any condition fail
     }
 
+
+    // select tbl row on click
+    private void rowSelect(){
+
+        tbl_itemsList.getSelectionModel().selectedItemProperty().addListener((observableValue, oldDto, newDto) -> {
+
+            if(newDto != null){
+                txt_itemCode.setText(newDto.getCode());
+                txt_itemCode_Delete.setText(newDto.getCode());
+                txt_unitPrice.setText(String.valueOf(newDto.getUnitPrice()));
+                txt_qty.setText(String.valueOf(newDto.getQty()));
+                txtArea_description.setText(newDto.getDescription());
+
+                txt_packSize.setText(newDto.getPackSize().replaceAll("[a-zA-Z]", ""));
+
+                comboBox_unit.setValue(newDto.getPackSize().replaceAll("[0-9]",""));
+            }
+
+        } );
+    }
 }

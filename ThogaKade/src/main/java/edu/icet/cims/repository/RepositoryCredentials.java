@@ -1,17 +1,42 @@
 package edu.icet.cims.repository;
 
+import edu.icet.cims.db.DbConfig;
 import edu.icet.cims.db.DbConnection;
-import edu.icet.cims.model.dto.ActiveUserDTO;
+import edu.icet.cims.model.dto.ActiveUserDto;
 import edu.icet.cims.model.entity.UserCredentialsEntity;
 
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class RepositoryCredentials {
 
-    public ActiveUserDTO credentialsCheck(UserCredentialsEntity credEntity){
+    public ActiveUserDto credentialsCheck(UserCredentialsEntity credEntity) throws SQLException {
 
+//     This function if it exists and matches uernmae, pswd, returns  user_id and name from that table
+        String sql = "SELECT user_id, name FROM credentials WHERE username=? AND password=?";
+
+            DbConnection.useDb(DbConfig.getDbConfigData().getDbName());                                    // use db
+            PreparedStatement stm = DbConnection.getInstance().getConnection().prepareStatement(sql);      // send query
+
+            stm.setObject(1, credEntity.getUsername());
+            stm.setObject(2, credEntity.getPassword());
+            ResultSet rst = stm.executeQuery();
+            System.out.println(rst);
+            if (rst.next()) {
+                return (new ActiveUserDto(rst.getString("user_id"), rst.getString("name")));
+            }
+
+        return null;
+    }
+}
+
+
+
+
+
+// another way
 //        This function only checks if it exists
 //        String sql = " SELECT EXISTS(" +
 //                " SELECT 1 " +
@@ -23,25 +48,6 @@ public class RepositoryCredentials {
 //        If it returns at least one row → EXISTS = 1
 //        If it returns no rows → EXISTS = 0
 
-
-//        This function if it exists and matches uernmae, pswd, returns  user_id and name from that table
-        String sql = "SELECT user_id, name FROM user_credentials WHERE username=? AND password=?";
-
-        try {
-            PreparedStatement stm = DbConnection.getInstance().getConnection().prepareStatement(sql);
-            stm.setObject(1, credEntity.getUsername());
-            stm.setObject(2, credEntity.getPassword());
-            ResultSet rst = stm.executeQuery();
-
-            if (rst.next()) {
+//            if (rst.next()) {
 //                return rst.getInt(1) > 0;   // EXISTS = 1, so returns true //  works with exist only function
-
-                return (new ActiveUserDTO(rst.getString("user_id"), rst.getString("name")));
-            }
-
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-        return null;
-    }
-}
+//        }

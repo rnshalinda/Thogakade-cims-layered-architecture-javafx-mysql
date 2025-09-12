@@ -105,7 +105,7 @@
             <Font name="System Bold" size="12.0" />
          </font>
       </CheckBox>
-      <RadioButton layoutX="1096.0" layoutY="219.0" mnemonicParsing="false" text="Mr." textFill="#000000ab">
+      <RadioButton fx:id="radio_Mr" layoutX="1096.0" layoutY="219.0" mnemonicParsing="false" text="Mr." textFill="#000000ab">
          <font>
             <Font name="System Bold" size="13.0" />
          </font>
@@ -113,7 +113,7 @@
             <ToggleGroup fx:id="radioTitleGroup" />
          </toggleGroup>
       </RadioButton>
-      <RadioButton layoutX="1155.0" layoutY="220.0" mnemonicParsing="false" text="Mrs." textFill="#000000ab" toggleGroup="$radioTitleGroup">
+      <RadioButton fx:id="radio_Mrs" layoutX="1155.0" layoutY="220.0" mnemonicParsing="false" text="Mrs." textFill="#000000ab" toggleGroup="$radioTitleGroup">
          <font>
             <Font name="System Bold" size="13.0" />
          </font>

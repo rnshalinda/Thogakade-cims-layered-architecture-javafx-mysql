@@ -18,6 +18,7 @@ public class WindowManagerUtil {
         stage = (Stage) ((Node) winEvent.getSource()).getScene().getWindow();                           // gets current window from the action-event that executed 'switchScene()' method
         stage.setScene(new Scene(FXMLLoader.load(WindowManagerUtil.class.getResource(fxmlPath))));      // assign new scene 'fxmlPath' to the old stage reference
         stage.show();
+        stage.centerOnScreen();  // force stage to appear in the center
 
         // since here we're dealing with one window at a time
         // I used the 'winEven' to assign the current window as a reference point to the new window
