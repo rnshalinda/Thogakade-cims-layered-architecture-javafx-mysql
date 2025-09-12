@@ -22,13 +22,15 @@ import javafx.scene.control.cell.PropertyValueFactory;
 
 import java.io.IOException;
 import java.net.URL;
-import java.sql.SQLException;
 import java.util.ResourceBundle;
 
 
 public class ItemController implements Initializable {
 
     ServiceItem service = new ServiceItemImpl();
+
+    @FXML
+    private Button btn_clear;
 
     @FXML
     private Button btn_delete;
@@ -169,6 +171,13 @@ public class ItemController implements Initializable {
     }
 
 
+    // clear all input text fields
+    @FXML
+    void btn_clearAllFieldsAction(ActionEvent event) {
+        clearFields();
+    }
+
+
     // Run at start of class
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -220,6 +229,11 @@ public class ItemController implements Initializable {
         txt_unitPrice.clear();
         txt_packSize.clear();
         txt_qty.clear();
+
+        radioBtn_new.setSelected(false);
+        radioBtn_update.setSelected(false);
+
+        comboBox_unit.setValue("");
     }
 
     // Initial validations - UI level

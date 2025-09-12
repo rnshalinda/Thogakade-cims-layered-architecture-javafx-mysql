@@ -18,14 +18,18 @@ import javafx.util.StringConverter;
 
 import java.io.IOException;
 import java.net.URL;
-import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Objects;
 import java.util.ResourceBundle;
 
 public class CustomerController implements Initializable {
 
     private ServiceCustomer service = new ServiceCustomerImpl();
+
+
+    @FXML
+    private Button btn_clear;
 
     @FXML
     private Button btn_delete;
@@ -200,6 +204,12 @@ public class CustomerController implements Initializable {
 
     }
 
+    // clear All input fields
+    @FXML
+    void btn_clearAllFieldsAction(ActionEvent event) {
+        clearFields();
+    }
+
     // Run at start of class
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -258,6 +268,14 @@ public class CustomerController implements Initializable {
         txt_City.clear();
         txt_poatalCode.clear();
         txt_custID_Delete.clear();
+
+        checkBox_new.setSelected(false);
+        checkBox_update.setSelected(false);
+
+        radio_Mr.setSelected(false);
+        radio_Mrs.setSelected(false);
+
+        date_dob.setValue(LocalDate.now());
     }
 
     // Initial validations - UI level

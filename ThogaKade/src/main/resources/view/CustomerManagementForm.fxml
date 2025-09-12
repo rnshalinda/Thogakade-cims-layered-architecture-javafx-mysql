@@ -165,5 +165,10 @@
             <Font name="ArialCE-Italic" size="14.0" />
          </font>
       </Label>
+      <Button fx:id="btn_clear" layoutX="1021.0" layoutY="615.0" mnemonicParsing="false" onAction="#btn_clearAllFieldsAction" prefHeight="27.0" prefWidth="57.0" text="Clear" textFill="#193582f0">
+         <font>
+            <Font name="Arial Bold" size="12.0" />
+         </font>
+      </Button>
    </children>
 </AnchorPane>

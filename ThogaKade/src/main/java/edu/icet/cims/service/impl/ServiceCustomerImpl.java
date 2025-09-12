@@ -5,10 +5,8 @@ import edu.icet.cims.model.entity.CustomerEntity;
 import edu.icet.cims.repository.RepositoryCustomer;
 import edu.icet.cims.service.ServiceCustomer;
 import edu.icet.cims.service.exception.CustomerServiceException;
-import edu.icet.cims.util.AlertPopupUtil;
 import edu.icet.cims.util.validator.CommonValidatorUtil;
 import edu.icet.cims.util.validator.CustomerValidatorUtil;
-import javafx.scene.control.Alert;
 
 import java.sql.SQLException;
 import java.util.ArrayList;

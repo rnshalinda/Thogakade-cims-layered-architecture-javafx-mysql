@@ -17,7 +17,7 @@
             <Font name="System Bold" size="15.0" />
          </font>
       </Button>
-      <Button fx:id="btn_mngeItems" layoutX="240.0" layoutY="219.0" mnemonicParsing="false" onAction="#btn_MngeItemsAction" text="Manage Items" textFill="#1d9930df">
+      <Button fx:id="btn_mngeItems" layoutX="240.0" layoutY="219.0" mnemonicParsing="false" onAction="#btn_MngeItemsAction" text="Manage Items" textFill="#117c21de">
          <font>
             <Font name="System Bold" size="15.0" />
          </font>

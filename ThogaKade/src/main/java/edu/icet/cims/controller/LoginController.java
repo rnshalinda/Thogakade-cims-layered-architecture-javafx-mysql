@@ -7,7 +7,6 @@ import edu.icet.cims.service.ServiceCredential;
 import edu.icet.cims.service.exception.UserCredentialsException;
 import edu.icet.cims.service.impl.ServiceCredentialsImpl;
 import edu.icet.cims.util.AlertPopupUtil;
-import edu.icet.cims.util.SessionUserUtil;
 import edu.icet.cims.util.WindowManagerUtil;
 import edu.icet.cims.util.configDb.DbCheckUtil;
 import edu.icet.cims.util.configDb.LoadDbConfigUtil;

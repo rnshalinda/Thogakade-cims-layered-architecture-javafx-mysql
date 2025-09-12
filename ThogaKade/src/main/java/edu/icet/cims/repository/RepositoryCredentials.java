@@ -5,7 +5,6 @@ import edu.icet.cims.db.DbConnection;
 import edu.icet.cims.model.dto.ActiveUserDto;
 import edu.icet.cims.model.entity.UserCredentialsEntity;
 
-import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;

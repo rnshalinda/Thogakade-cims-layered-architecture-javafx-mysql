@@ -1,7 +1,6 @@
 package edu.icet.cims.repository;
 
 import edu.icet.cims.db.DbConnection;
-import edu.icet.cims.model.dto.CustomerDto;
 import edu.icet.cims.model.entity.CustomerEntity;
 
 import java.sql.PreparedStatement;
