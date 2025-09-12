@@ -1,7 +1,0 @@
-database:
-  pswd: '1234'
-  port: '3306'
-  dbName: thogakade_cims
-  parameter: ''
-  host: localhost
-  user: root
