@@ -65,8 +65,7 @@ This project was built to simulate a small-scale POS/Inventory Management system
       ├── db-config.yml   # DB connection config
       └── db-data.yml     # Seed data
 
-
----
+--- 
 
 ## 🔑 Login & Session Flow
 
@@ -80,9 +79,44 @@ This project was built to simulate a small-scale POS/Inventory Management system
 4. **SessionUserUtil** stores the active user in memory.  
 5. **WindowManagerUtil** switches the scene to `Dashboard.fxml`.
 
+   <img width="600" height="426" alt="image" src="https://github.com/user-attachments/assets/34d034ff-7e1b-44d1-92f0-bc49b4d4e5ed" />
+
+
+
 ---
 
-## ⚙️ Database Config & Seeding
+## 🗄️ Database Connection (Singleton)
+
+A key part of this project is the **`DbConnection` class**, which follows the **Singleton Design Pattern**.
+
+### Why Singleton?
+- We only ever need **one active database connection** at a time.
+- Prevents accidentally opening multiple connections (which would waste resources).
+- Provides a **single global access point** to the DB connection.
+
+### How It Works
+```java
+// Access a single instance
+DbConnection connection = DbConnection.getInstance();
+
+// Get the underlying JDBC connection
+Connection con = connection.getConnection();
+```
+Dynamic connection: the constructor does not include a fixed database name in the URL.
+
+- Example: jdbc:mysql://localhost:3306/ (notice no /dbname).
+- This allows running queries like CREATE DATABASE ... before selecting the DB.
+
+Switching database: once a DB is created/selected, you can explicitly call:
+```
+DbConnection.useDb("thogakade");
+// which executes a SQL USE <dbName>
+```
+
+---
+
+## ⚙️ Database Config
+Project includes an *interactive DB configurator* and *DB creation/seed* feature so end users can configure the database connection in the app without editing code.
 
 ### `db-config.yml`  
 Externalizes DB settings so no hard-coded values:  
@@ -96,6 +130,7 @@ database:
   user: root
 ```
 
+---
 ## 📦 Dependencies (pom.xml)
 
 ```xml
