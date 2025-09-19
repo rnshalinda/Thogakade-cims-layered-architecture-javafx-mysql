@@ -79,9 +79,12 @@ This project was built to simulate a small-scale POS/Inventory Management system
 4. **SessionUserUtil** stores the active user in memory.  
 5. **WindowManagerUtil** switches the scene to `Dashboard.fxml`.
 
-   <img width="600" height="426" alt="image" src="https://github.com/user-attachments/assets/34d034ff-7e1b-44d1-92f0-bc49b4d4e5ed" />
-
-
+  <p align="left">
+    <img src="https://github.com/user-attachments/assets/4cd76818-c96c-47c6-a7d7-b8d94cef817e" width="420">
+  </p>
+  <p align="left">
+    <img src="https://github.com/user-attachments/assets/64c2d568-5762-4b75-afd0-39fc12cb719d" width="600">
+  </p>
 
 ---
 
@@ -116,7 +119,7 @@ DbConnection.useDb("thogakade");
 ---
 
 ## ⚙️ Database Config
-Project includes an *interactive DB configurator* and *DB creation/seed* feature so end users can configure the database connection in the app without editing code.
+Project includes an *interactive DB configurator* and *DB creation/seed* feature so end users can configure the database connection or create new database in the app without editing code.
 
 ### `db-config.yml`  
 Externalizes DB settings so no hard-coded values:  
