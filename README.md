@@ -64,8 +64,11 @@ This project was built to simulate a small-scale POS/Inventory Management system
       ├── view/           # JavaFX FXML views
       ├── db-config.yml   # DB connection config
       └── db-data.yml     # Seed data
+<br>
 
 --- 
+
+
 
 ## 🔑 Login & Session Flow
 
@@ -78,15 +81,19 @@ This project was built to simulate a small-scale POS/Inventory Management system
 3. **Repository** executes parameterized `SELECT ... WHERE username=? AND password=?`.  
 4. **SessionUserUtil** stores the active user in memory.  
 5. **WindowManagerUtil** switches the scene to `Dashboard.fxml`.
-
+<br>
   <p align="left">
     <img src="https://github.com/user-attachments/assets/4cd76818-c96c-47c6-a7d7-b8d94cef817e" width="420">
   </p>
+  <br>
   <p align="left">
     <img src="https://github.com/user-attachments/assets/64c2d568-5762-4b75-afd0-39fc12cb719d" width="600">
   </p>
 
+<br>
+
 ---
+
 
 ## 🗄️ Database Connection (Singleton)
 
@@ -116,9 +123,14 @@ DbConnection.useDb("thogakade");
 // which executes a SQL USE <dbName>
 ```
 
+<br>
+
 ---
 
+
+
 ## ⚙️ Database Config
+
 Project includes an **interactive Database Configurator** and a **Database Creation/Seeding** feature.  
 The goal is to let end users set up the database connection **without editing any code**. 
 
@@ -133,15 +145,20 @@ The goal is to let end users set up the database connection **without editing an
     
 - **Create Database**  
   - If no DB is found, user can choose to create one entirely from scratch.  
-  - The app runs the necessary SQL scripts to **create the schema, tables, and even seed sample data** (from `db-data.yml`).  
+  - The app runs the necessary SQL scripts to **create the schema, tables, and even seed sample data** (from `db-data.yml`).
+  
+<br>
 
+🎥 **Demo:**
 <div align="left">
   <video src="https://github.com/user-attachments/assets/5cbe6f2c-3006-4e75-8059-bc0c9334db39">
   </video>
 </div>
 
+<br>
+
 ### `db-config.yml`  
-After configuration, the access details are saved here — meaning no need to reconfigure every run.  
+After configuration, the new access details are automatically saved here — meaning no need to reconfigure every run.  
 This avoids **hard-coded credentials** inside the source code: 
 ```yaml
 database:
@@ -153,14 +170,142 @@ database:
   user: root
 ```
 
+<br>
+
 ---
+
+
+## 👥 Customer Management (CRUD)
+
+The system supports full **Customer CRUD operations** (Create, Read, Update, Delete) with layered validation and error handling.  
+
+- **Validation Layer:**  
+  Before persisting, customer data is validated using `CustomerValidatorUtil` and `CommonValidatorUtil`.  
+  Examples:  
+  - Customer ID format → `C001`  
+  - Name format (letters only, first letter uppercase, max 30 chars)  
+  - DOB cannot be in the future & age < 120  
+  - Address / Postal Code character rules  
+
+- **Service Layer (`ServiceCustomerImpl`)**  
+  Handles business logic and validation.  
+  Delegates database actions to the repository, and throws `CustomerServiceException` on validation or DB errors.  
+
+- **Repository Layer (`RepositoryCustomer`)**  
+  Encapsulates all SQL queries for customers.  
+
+<br>
+
+🎥 **Demo: Customer CRUD**  
+<div align="left">
+  <video src="https://github.com/user-attachments/assets/31b8e671-da35-440d-9370-456b72f3fcc0"></video>
+</div>
+
+<br>
+
+---
+
+
+
+## 📦 Item Management (CRUD)
+
+Similar to customer handling, the system supports full **Item CRUD operations** with validation rules.  
+
+- **Validation Layer:**  
+  - Item code format → `P001`, `B0123`  
+  - Description max length: 100 chars  
+  - Pack size validation (e.g., `1kg`, `1.5L`)  
+  - Price must not be `0.00`  
+  - Quantity must not be `0`  
+
+- **Service Layer (`ServiceItemImpl`)**  
+  Converts between `ItemDto` and `ItemEntity`, validates, and throws `ItemServiceException` on invalid input or SQL errors.  
+
+- **Repository Layer (`RepositoryItem`)**  
+  Encapsulates SQL queries for inserting, updating, deleting, and fetching items.  
+
+<br>
+
+🎥 **Demo: Item CRUD**  
+<div align="left">
+  <video src="https://github.com/user-attachments/assets/2887deba-4ced-46d2-969c-04d0ead92ed1"></video>
+</div>
+
+<br>
+
+---
+
+
+
 ## 📦 Dependencies (pom.xml)
 
 ```xml
   <dependencies>
-    JavaFX 19 — UI toolkit
-    MySQL Connector/J 8/9 — JDBC driver
-    Lombok — boilerplate reduction      
-    SnakeYAML 2.4 — YAML parsing
+      JavaFX 19 — UI toolkit
+      MySQL Connector/J 8/9 — JDBC driver
+      Lombok — boilerplate reduction      
+      SnakeYAML 2.4 — YAML parsing
   </dependencies>
 ```
+
+<br>
+
+
+
+## 🚀 How to Run the Project
+
+### 🧰 Prerequisites
+
+Make sure you have the following installed on your system:
+- **Java 21** or later  
+- **Maven** (for dependency management and build)  
+- **MySQL Server** (local or remote instance running)  
+- **IDE** (IntelliJ IDEA recommended, with JavaFX plugin support)  
+
+
+1. **Clone the Repository**
+   ```bash
+   git clone https://github.com/rnshalinda/Thogakade-cims-layered-architecture-javafx-mysql.git
+   cd Thogakade-cims-layered-architecture-javafx-mysql/ThogaKade
+   ```
+2. Open the project in IntelliJ IDEA.
+   
+3. **Build with Maven** in the InteliJ console run
+   ```bash
+   mvn clean install
+   ```
+4. Run Main.java
+
+<br>
+
+---
+
+
+## 🛠️ Troubleshoot Common Issues (IntelliJ / Maven)
+
+When running the project after cloning, you might face errors like:
+
+    java: cannot find symbol
+    symbol: method getDbName()
+    location: class edu.icet.cims.model.dto.DbConfigDto
+
+This usually happens because IntelliJ has not properly indexed the project or Maven dependencies.
+
+### ✅ Solution
+1. **Reimport Maven Project**  
+   - In IntelliJ, right–click the `pom.xml` → *Add as Maven Project*.  
+   - Or, click the *Maven* tool window → refresh/reimport.  
+
+2. **Invalidate Caches & Restart**  
+   - Go to `File → Invalidate Caches / Restart`.  
+   - This forces IntelliJ to rebuild its indexes.  
+
+3. **Rebuild Project**  
+   - From the top menu: `Build → Rebuild Project`.  
+
+4. **Check Java SDK**  
+   - Ensure the project SDK is set to Java 21 (since this project uses Java 21).  
+   - `File → Project Structure → Project SDK`.
+
+After these steps, IntelliJ should correctly recognize methods like `getDbName()` and the project will build and run without issues.
+
