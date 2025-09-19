@@ -241,9 +241,10 @@ Similar to customer handling, the system supports full **Item CRUD operations** 
 
 ```xml
   <dependencies>
-      JavaFX 19 — UI toolkit
+      Javafx-controls 19 — UI toolkit
+      Javafx-fxml 19
       MySQL Connector/J 8/9 — JDBC driver
-      Lombok — boilerplate reduction      
+      Lombok 1.18.38 — boilerplate reduction      
       SnakeYAML 2.4 — YAML parsing
   </dependencies>
 ```
