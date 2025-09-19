@@ -73,7 +73,7 @@ This project was built to simulate a small-scale POS/Inventory Management system
 2. **Service**:
    - validates format (no whitespace, length ≥ 3, alphanumeric username).  
    - calls repository to check credentials.  
-   - returns `ActiveUserDto` if valid.  
+   - returns `ActiveUserDto` if valid, Which is used to diplay Active-user and Name.  
    - throws `UserCredentialsException` if invalid or DB error.  
 3. **Repository** executes parameterized `SELECT ... WHERE username=? AND password=?`.  
 4. **SessionUserUtil** stores the active user in memory.  
@@ -119,10 +119,30 @@ DbConnection.useDb("thogakade");
 ---
 
 ## ⚙️ Database Config
-Project includes an *interactive DB configurator* and *DB creation/seed* feature so end users can configure the database connection or create new database in the app without editing code.
+Project includes an **interactive Database Configurator** and a **Database Creation/Seeding** feature.  
+The goal is to let end users set up the database connection **without editing any code**. 
+
+- On startup, the app first **checks if the target database exists**.  
+  - ✅ If database **exists** → it proceeds to check for the required tables (like `user_credentials`) and proceed to **login**.  
+  - ❌ If database or required tables are **missing** → the user is prompted to configure or create them.  
+
+### 🛠️ User Options  
+- **Configure Database**  
+  - If DB already exists but under a *different name*, user can simply enter the new **host / port / username / password / dbName** in the configurator.  
+  - The app will then generate a fresh `db-config.yml` file with these details — so the connection works next time without re-entering.
+    
+- **Create Database**  
+  - If no DB is found, user can choose to create one entirely from scratch.  
+  - The app runs the necessary SQL scripts to **create the schema, tables, and even seed sample data** (from `db-data.yml`).  
+
+<div align="left">
+  <video src="https://github.com/user-attachments/assets/5cbe6f2c-3006-4e75-8059-bc0c9334db39">
+  </video>
+</div>
 
 ### `db-config.yml`  
-Externalizes DB settings so no hard-coded values:  
+After configuration, the access details are saved here — meaning no need to reconfigure every run.  
+This avoids **hard-coded credentials** inside the source code: 
 ```yaml
 database:
   pswd: '1234'
