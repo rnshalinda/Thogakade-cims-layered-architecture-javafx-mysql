@@ -156,7 +156,9 @@ public class CustomerController implements Initializable {
     void btn_updateCustListAction(ActionEvent event) {
 
         String custId = txt_custID.getText().toUpperCase();                                 // Customer ID
-        String title =  ((RadioButton) radioTitleGroup.getSelectedToggle()).getText();      // Title Mr. / Mrs
+
+        String title =  (radioTitleGroup.getSelectedToggle() != null) ?  ((RadioButton)radioTitleGroup.getSelectedToggle()).getText() : null;     // Title Mr. / Mrs
+
         String name = txt_name.getText();                                                   // Customer name
         LocalDate dob = date_dob.getValue();                                                // Date of birth
         String address = txtArea_address.getText();                                         // Address
@@ -283,7 +285,7 @@ public class CustomerController implements Initializable {
 
         String status;
 
-        if(custId.isEmpty() || title.isEmpty() || name.isEmpty() || dob==null || address.isEmpty() || city.isEmpty()  || postalCode.isEmpty()){     // null check
+        if(custId.isEmpty() || title==null || name.isEmpty() || dob==null || address.isEmpty() || city.isEmpty()  || postalCode.isEmpty()){     // null check
             status = "Fields cannot be empty";
 
         } else if (comboBox_province.getValue() == null) {

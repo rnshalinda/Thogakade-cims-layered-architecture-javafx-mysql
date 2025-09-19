@@ -22,7 +22,7 @@ public class RepositoryCredentials {
             stm.setObject(1, credEntity.getUsername());
             stm.setObject(2, credEntity.getPassword());
             ResultSet rst = stm.executeQuery();
-            System.out.println(rst);
+
             if (rst.next()) {
                 return (new ActiveUserDto(rst.getString("user_id"), rst.getString("name")));
             }
