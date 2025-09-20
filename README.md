@@ -298,8 +298,8 @@ This usually happens because IntelliJ has not properly indexed the project or Ma
    - Or, click the *Maven* tool window → refresh/reimport.  
 
 2. **Invalidate Caches & Restart**  
-   - Go to `File → Invalidate Caches / Restart`.  
-   - This forces IntelliJ to rebuild its indexes.  
+   - Go to `File → Invalidate Caches -> Tick all -> Invalidate and Restart`.  
+   - This forces IntelliJ to clear caches and rebuild its indexes.  
 
 3. **Rebuild Project**  
    - From the top menu: `Build → Rebuild Project`.  
